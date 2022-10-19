@@ -71,7 +71,7 @@ const AuthContextProvider = (props)=>{
         console.log(res)
         setMyKey(res.data.key)
         setCurrentUser(res.data.user)
-        sessionStorage.setItem('currentuser',res.data.user)
+        sessionStorage.setItem('currentuser',JSON.stringify(res.data.user))
         const myToken = window.btoa(res.data.key)
         sessionStorage.setItem('token',myToken)
    
