@@ -7,7 +7,8 @@ export const AuthContext = createContext();
 const url = "http://127.0.0.1:8000/"
 
 const AuthContextProvider = (props)=>{
-  const [currentUser,setCurrentUser] = useState(sessionStorage.getItem('currentuser') || false);
+  
+  const [currentUser,setCurrentUser] = useState(JSON.parse(sessionStorage.getItem("currentuser")) || false)
   let keys = sessionStorage.getItem('token')
   const [myKey,setMyKey] = useState(keys && window.atob(keys))
 
@@ -30,15 +31,20 @@ const AuthContextProvider = (props)=>{
               "password1": password1
           }
 
+
     try {
       const res = await axios.post(`${url}auth/register/`,userInfo)
 
       if(res.data.token){
-        console.log(res)
+
         setMyKey(res.data.token)
-        setCurrentUser({...res.data,token:''})
-        sessionStorage.setItem('currentuser',currentUser)
-        const myToken = window.btoa(res.data.token)
+        setCurrentUser({...res.data,'token':''})
+
+        const userData = { ...res.data, token: '' }
+        sessionStorage.setItem("currentuser", JSON.stringify(userData))
+       const myToken = window.btoa(res.data.token)
+        console.log(res.data);
+        console.log(currentUser);
         sessionStorage.setItem('token',myToken)
         toastSuccessNotify('User registered successfully.')
         navigate("/")
@@ -52,7 +58,7 @@ const AuthContextProvider = (props)=>{
 
   const signIn = async (email,password,userName,navigate)=>{
 
-
+    console.log(email,password,userName);
     try {
       console.log(email)
       const res = await axios.post(`${url}auth/login/`,{
