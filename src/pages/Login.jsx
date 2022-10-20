@@ -4,9 +4,10 @@ import BadgeTwoToneIcon from '@mui/icons-material/BadgeTwoTone';
 import { Grid, Stack, TextField, InputAdornment, Button, Box } from '@mui/material'
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext';
 import { useContext } from 'react';
+import Paper from '@mui/material/Paper';
 // import { toastSuccessNotify } from '../helper/helper';
 
 
@@ -14,8 +15,8 @@ const Login = () => {
     const navigate = useNavigate()
     const { signIn } = useContext(AuthContext)
     return (
-        <div style={{ margin: "2rem 5rem" }}>
-            <Grid style={{ width: '25rem', backgroundColor: 'whitesmoke', padding: '2rem', borderRadius: '0.75rem', boxShadow: '18px 18px 25px black' }} >
+        <Grid container component="main" sx={{ maxHeight: '90vh', height:'90vh', display:'flex', justifyContent:'center', alignItems:'center', }}>
+            <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square style={{ width: '25rem', backgroundColor: 'whitesmoke', padding: '2rem', borderRadius: '0.75rem', boxShadow: '18px 18px 25px black' }} >
                 <Box style={{ textAlign: 'center', mb: 2 }}>
                     <img className='blogimg' src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.treehugger.com%2Ffacts-about-beautiful-bald-eagle-4857896&psig=AOvVaw1CGZQ2xeQD1BgCKrv5v22m&ust=1666295476292000&source=images&cd=vfe&ved=0CA0QjRxqFwoTCMDrmsOI7foCFQAAAAAdAAAAABAc" alt="Eagle" />
                     <h3>- Login -</h3>
@@ -104,8 +105,16 @@ const Login = () => {
                         </Form>
                     )}
                 </Formik>
+            <Grid container sx={{ mt:2}}>
+
+                <Grid item>
+                  <Link to="/register" variant="body2" style={{color:"darkslategray"}}>
+                    {"If you don't have an account? Register"}
+                  </Link>
+                </Grid>
+              </Grid>
             </Grid>
-        </div>
+        </Grid>
 
     )
 }
