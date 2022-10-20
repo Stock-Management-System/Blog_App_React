@@ -1,3 +1,4 @@
+import { useContext } from 'react'
 import { 
   BrowserRouter as Router,
   Route,
@@ -6,6 +7,7 @@ import {
   Outlet,
 } from 'react-router-dom'
 import NavBar from '../components/NavBar'
+import { AuthContext } from '../context/AuthContext'
 import Home from '../pages/Home'
 import Login from '../pages/Login'
 import NewBlog from '../pages/NewBlog'
@@ -15,7 +17,7 @@ import Register from '../pages/Register'
 import UpdateBlog from '../pages/UpdateBlog'
 
 const AppRouter = () => {
- const currentUser = false
+ const {currentUser} = useContext(AuthContext)
 
   function PrivateRouter() {
     return currentUser ? <Outlet /> : <Navigate to="/login" replace />;
@@ -31,7 +33,7 @@ const AppRouter = () => {
         <Route path="/newblog" element={<PrivateRouter />}>
           <Route path="" element={<NewBlog />} />
         </Route> 
-        
+
         <Route path="/profile" element={<PrivateRouter />}>
           <Route path="" element={<Profile />} />
         </Route>

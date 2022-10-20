@@ -11,12 +11,6 @@ const AuthContextProvider = (props)=>{
   const [currentUser,setCurrentUser] = useState(JSON.parse(sessionStorage.getItem("currentuser")) || false)
   let keys = sessionStorage.getItem('token')
   const [myKey,setMyKey] = useState(keys && window.atob(keys))
-
-
-
-  
-  
-  
   
   const createUser = async (email,password,firstName,lastName,username,profile_pic,biography,password1,navigate)=>{
     
