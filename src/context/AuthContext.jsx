@@ -84,8 +84,8 @@ const AuthContextProvider = (props)=>{
       var config = {
         method: 'post',
         url: `${url}auth/logout/`,
-        headers: { 
-          'Authorization': `Token ${myKey}`, 
+        headers: {
+          'Authorization': `Token ${myKey}`,
         }
       };
       const res = await axios(config)
@@ -97,8 +97,6 @@ const AuthContextProvider = (props)=>{
         toastSuccessNotify('User log out successfully.')
         navigate("/")
       }
-      
-      
     } catch (error) {
       toastErrorNotify(error.message)
     }
