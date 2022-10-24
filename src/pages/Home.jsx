@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { Grid } from '@mui/material';
+import { Badge, Grid } from '@mui/material';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { useNavigate } from "react-router-dom";
@@ -21,19 +21,21 @@ const Home = () => {
   const { currentUser } = useContext(AuthContext)
   console.log(currentUser);
 
-  const { getBlogs, blogs } = useContext(BlogContext)
+  const { getBlogs, blogs, getCategory, categories, } = useContext(BlogContext)
 
   useEffect(() => {
     getBlogs();
+    getCategory();
 
   }, [])
 
+  console.log(categories);
   const navigate = useNavigate()
   const openDetails = (slug) => {
     if (!currentUser) {
       toastErrorNotify("Login for details of blog!");
     } else {
-      navigate(`/details/${slug}`, {state: { slug }})
+      navigate(`/details/${slug}`, { state: { slug } })
     }
   }
   return (
@@ -72,26 +74,32 @@ const Home = () => {
                     {blog.content}
                   </Typography>
                 </CardContent>
+
               </div>
-              <CardActions disableSpacing sx={{ position: "absolute", bottom: "5px", left: "5px" }}>
-                <IconButton aria-label="add to favorites">
-                  <FavoriteIcon />
-                  <Typography sx={{ marginLeft: 1 }}>
-                    {blog.like_count}
-                  </Typography>
-                </IconButton>
-                <IconButton aria-label="comment">
-                  <ChatOutlinedIcon />
-                  <Typography sx={{ marginLeft: 1 }}>
-                    {blog.comment_count}
-                  </Typography>
-                </IconButton>
-                <IconButton aria-label="view">
-                  <RemoveRedEyeOutlinedIcon />
-                  <Typography sx={{ marginLeft: 1 }}>
-                    {blog.post_view_count}
-                  </Typography>
-                </IconButton>
+              <CardActions disableSpacing sx={{ width: "90%", display: "flex", justifyContent: "space-between", position: "absolute", bottom: "5px", left: "5px" }}>
+                <div>
+                  <IconButton aria-label="add to favorites">
+                    <FavoriteIcon sx={{ color: (blog.like_post?.filter((like) => like.user_id === currentUser.id)[0]?.user_id) && "red" }} />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {blog.like_count}
+                    </Typography>
+                  </IconButton>
+                  <IconButton aria-label="comment">
+                    <ChatOutlinedIcon />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {blog.comment_count}
+                    </Typography>
+                  </IconButton>
+                  <IconButton aria-label="view">
+                    <RemoveRedEyeOutlinedIcon />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {blog.post_view_count}
+                    </Typography>
+                  </IconButton>
+                </div>
+                <div>
+                  <Badge badgeContent={blog.category} color="primary" sx={{ mx: 2 }} />
+                </div>
               </CardActions>
             </Card>
 
