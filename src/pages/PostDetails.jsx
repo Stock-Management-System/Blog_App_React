@@ -22,6 +22,7 @@ import { Button, Divider, InputAdornment, List, ListItem, ListItemAvatar, ListIt
 
 const PostDetails = () => {
 
+  const [likeColor, setLikeColor] = useState(false);
   const [comment, setComment] = useState();
   const { getOneBlog, blogDetail, detailLoading, setComments } = useContext(BlogContext)
   const { currentUser } = useContext(AuthContext)
@@ -60,10 +61,17 @@ const PostDetails = () => {
       url: `${base_url}api/like/`,
       headers: {
         'Authorization': `Token ${token}`,
-      }
+      },
+      data : data
     }
-    const x = await axios(`${base_url}api/like/`, data, config)
-    console.log(x)
+    try {
+      const x = await axios(config)
+      getOneBlog(state.slug);
+      setLikeColor(!likeColor)
+      console.log(x)
+    } catch (error) {
+      console.log(error)
+    }
   }
   const handleFavorite = () => {
     like()
@@ -103,7 +111,7 @@ const PostDetails = () => {
             </CardContent>
             <CardActions disableSpacing sx={{ bottom: "5px", left: "5px" }}>
               <IconButton aria-label="add to favorites">
-                <FavoriteIcon onClick={() => handleFavorite()} sx={{ color: "red" }} />
+                <FavoriteIcon onClick={() => handleFavorite()} sx={{ color: (blogDetail.like_post?.filter((like) => like.user_id === currentUser.id)[0]?.user_id) && "red" }} />
                 <Typography sx={{ marginLeft: 1 }}>
                   {blogDetail.like_count}
                 </Typography>
@@ -137,15 +145,15 @@ const PostDetails = () => {
                             <Typography
                               sx={{ display: 'inline', mr: 2 }}
                               component="span"
-                              variant="body2"
-                              color="text.primary"
+                              variant="body4"
+                              color="text.secondary"
                             >
                               {(new Date(comment.time_stamp).toUTCString()).slice(0, 16)}
                             </Typography>
                             <Typography
                               component="p"
-                              variant="body2"
-                              color="text.secondary">
+                              variant="body1"
+                              color="text.primary">
                               {comment.content}
                             </Typography>
                           </React.Fragment>

@@ -7,13 +7,13 @@ export const AuthContext = createContext();
 const url = "http://127.0.0.1:8000/"
 
 const AuthContextProvider = (props)=>{
-  
+
   const [currentUser,setCurrentUser] = useState(JSON.parse(sessionStorage.getItem("currentuser")) || false)
   let keys = sessionStorage.getItem('token')
   const [myKey,setMyKey] = useState(keys && window.atob(keys))
-  
+
   const createUser = async (email,password,firstName,lastName,username,profile_pic,biography,password1,navigate)=>{
-    
+
     const userInfo = {
               "username": username,
               "email": email,
@@ -44,7 +44,6 @@ const AuthContextProvider = (props)=>{
         navigate("/")
       }
 
-      
     } catch (error) {
       toastErrorNotify(error.message)
     }
@@ -68,12 +67,12 @@ const AuthContextProvider = (props)=>{
         sessionStorage.setItem('currentuser',JSON.stringify(res.data.user))
         const myToken = window.btoa(res.data.key)
         sessionStorage.setItem('token',myToken)
-   
+
         toastSuccessNotify('User login successfully.')
         navigate("/")
       }
 
-      
+
     } catch (error) {
       toastErrorNotify(error.message)
     }
@@ -94,7 +93,7 @@ const AuthContextProvider = (props)=>{
         setCurrentUser(false)
         setMyKey(false)
         sessionStorage.clear()
-        toastSuccessNotify('User log out successfully.')
+        toastSuccessNotify('User logged out successfully.')
         navigate("/")
       }
     } catch (error) {
@@ -109,6 +108,7 @@ const AuthContextProvider = (props)=>{
     signIn,
     logOut
  }
+
 
 
   return (
