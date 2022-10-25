@@ -35,14 +35,12 @@ const NewBlog = () => {
 
   useEffect(() => {
     getCategory();
-
   }, [])
 
   console.log(newBlog);
   const handleSubmit = (e) => {
     e.preventDefault();
     createPost(newBlog);
-    
   }
 
   return (

@@ -404,7 +404,7 @@ const pages = ['Products', 'Pricing', 'Blog']
 
 const NavBar = () => {
   const navigate = useNavigate()
-  const { currentUser, logout } = useContext(AuthContext)
+  const { currentUser, logOut } = useContext(AuthContext)
   const settings = currentUser
     ? ['About', 'Profile', 'NewBlog', 'Logout']
     : ['About', 'Login', 'Register']
@@ -528,7 +528,7 @@ const NavBar = () => {
               About
             </Button>
           </Box>
-          
+
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title=  {currentUser ?currentUser.username :'Authorization'}>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -555,7 +555,7 @@ const NavBar = () => {
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   {setting === 'Logout' ? (
                     <Typography
-                      onClick={() => logout(navigate)}
+                      onClick={() => logOut(navigate)}
                       textAlign="center"
                     >
                       {setting}
@@ -933,7 +933,7 @@ const BlogContextProvider = (props)=>{
 
     const getBlogs = async () => {
 
-        const blogUrl = base_url + "api/posts/"
+        const blogUrl = base_url + `api/posts/?limit=${page}&offset=0`
         try {
             const res = await axios.get(blogUrl)
             setBlogs(res.data.results)
@@ -1090,10 +1090,8 @@ const Home = () => {
                 </IconButton>
               </CardActions>
             </Card>
-
           </Grid>))}
       </Grid>
-
     </div>
   )
 }
@@ -1167,29 +1165,554 @@ const Cards = () => {
 export default Cards;
 ```
 
+## 🚩 Update "NewBlog.jsx" 👇
+
+```javascript
+import React, { useEffect } from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import Typography from '@mui/material/Typography';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Form, Link, useNavigate } from "react-router-dom";
+import { FormControl } from '@mui/material';
+import { AuthContext } from '../context/AuthContext';
+import { InputLabel, MenuItem, Select, TextareaAutosize } from '@mui/material';
+import { BlogContext } from '../context/BlogContext';
+
+const theme = createTheme();
+
+const NewBlog = () => {
+  const navigate = useNavigate()
+
+  const { getCategory, categories, createPost } = React.useContext(BlogContext)
+
+  const { createUser } = React.useContext(AuthContext)
+
+  const [newBlog, setNewBlog] = React.useState({
+    "title": "",
+    "category_id": 0,
+    "content": "",
+    "image": "",
+    "status": ""
+  });
+
+  useEffect(() => {
+    getCategory();
+  }, [])
+
+  console.log(newBlog);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createPost(newBlog);
+  }
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Grid container component="main" sx={{ maxHeight: '91.5vh' }}>
+        <CssBaseline />
+
+        <Grid item xs={12} component={Paper} elevation={6} square>
+
+          <Box
+            sx={{
+              my: 8,
+              mx: 4,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'darkslategray' }}>
+              <NewspaperIcon />
+            </Avatar>
+
+            <Typography component="h1" variant="h5" sx={{ color: "tomato" }}>
+              New Blog
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.8, width: 350 }}>
+                  <TextField
+                    label="Title"
+                    name="title"
+                    id="title"
+                    type="text"
+                    variant="outlined"
+                    required
+                    value={newBlog.title}
+                    onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Categories</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      name='category'
+                      defaultValue=""
+                      label="Categories"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "category_id": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Categories</em>
+                      </MenuItem>
+                      {categories?.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <TextareaAutosize
+                    minRows={5}
+                    aria-label="Content"
+                    placeholder="Content"
+                    value={newBlog.content}
+                    defaultValue=""
+                    required
+                    onChange={(e) => setNewBlog({ ...newBlog, "content": e.target.value })}
+                  />
+
+                  <TextField
+                    label="Image URL"
+                    name="image"
+                    id="image"
+                    type="url"
+                    variant="outlined"
+                    value={newBlog.image}
+                    onChange={(e) => setNewBlog({ ...newBlog, "image": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Status</InputLabel>
+                    <Select
+                      labelId="status"
+                      id="status"
+                      name='status'
+                      defaultValue=""
+                      label="Status"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "status": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Status</em>
+                      </MenuItem>
+                      <MenuItem value="d">Draft</MenuItem>
+                      <MenuItem value="p">Published</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Button type="submit" variant="contained" size="large">
+                    Send
+                  </Button>
+                </Box>
+              </FormControl>
+            </form>
+          </Box >
+
+        </Grid >
+      </Grid >
+    </ThemeProvider >
+  )
+}
+
+export default NewBlog
+```
+
 ## 🚩 Code "PostDetails.jsx" page 👇
 
 ```javascript
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { BlogContext } from '../context/BlogContext'
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import { red } from '@mui/material/colors';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
+import { Button, Divider, InputAdornment, List, ListItem, ListItemText, TextField } from '@mui/material';
 
 const PostDetails = () => {
-  const {getOneBlog} = useContext(BlogContext)
+
+  const [likeColor, setLikeColor] = useState(false);
+  const [comment, setComment] = useState();
+  const { getOneBlog, blogDetail, detailLoading, setComments } = useContext(BlogContext)
+  const { currentUser } = useContext(AuthContext)
+  const { state } = useLocation()
+  console.log(blogDetail)
+  console.log(currentUser)
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    const value = e.target.value;
+    setComment(value);
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setComments(state.slug, comment);
+    setComment("");
+  }
 
   useEffect(() => {
-    const result = getOneBlog("gezi-97263409c9")
-    console.log(result)
+    getOneBlog(state.slug)
   }, [])
+
+  const base_url = "http://127.0.0.1:8000/"
+
+  const token = window.atob(sessionStorage.getItem('token'));
+
+  const like = async () => {
+    var data = {
+      "user_id": currentUser.id,
+      "post": blogDetail.id
+    };
+    console.log("Like isteği yapıldı.");
+    var config = {
+      method: 'post',
+      url: `${base_url}api/like/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+      },
+      data : data
+    }
+    try {
+      const x = await axios(config)
+      getOneBlog(state.slug);
+      setLikeColor(!likeColor)
+      console.log(x)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const handleFavorite = () => {
+    like()
+  }
 
   return (
     <div>
-      PostDetails
+      {detailLoading ? (
+        <Box sx={{ display: 'flex' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box style={{ display: "flex", alignItem: "center", justifyContent: "center", position: "relative" }} sx={{ maxWidth: { xs: "100%", sm: "80%", md: "60%" }, marginX: "auto" }}>
+          <Box sx={{}}>
+            <CardMedia
+              component="img"
+              height="300"
+              image={blogDetail.image}
+              alt={blogDetail.title}
+            />
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: red[500] }} alt={blogDetail.author} aria-label="blog">
+                </Avatar>
+              }
+              title={blogDetail.author}
+              subheader={blogDetail.last_updated_date.slice(0, 10)}
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                {blogDetail.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {blogDetail.content}
+              </Typography>
+            </CardContent>
+            <CardActions disableSpacing sx={{ bottom: "5px", left: "5px" }}>
+              <IconButton aria-label="add to favorites">
+                <FavoriteIcon onClick={() => handleFavorite()} sx={{ color: (blogDetail.like_post?.filter((like) => like.user_id === currentUser.id)[0]?.user_id) && "red" }} />
+                <Typography sx={{ marginLeft: 1 }}>
+                  {blogDetail.like_count}
+                </Typography>
+              </IconButton>
+              <IconButton aria-label="comment">
+                <ChatOutlinedIcon />
+                <Typography sx={{ marginLeft: 1 }}>
+                  {blogDetail.comment_count}
+                </Typography>
+              </IconButton>
+              <IconButton aria-label="view">
+                <RemoveRedEyeOutlinedIcon />
+                <Typography sx={{ marginLeft: 1 }}>
+                  {blogDetail.post_view_count}
+                </Typography>
+              </IconButton>
+            </CardActions>
+
+            <Box>
+              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                {blogDetail.comment_post.map((comment) => (
+                  <>
+                    <ListItem alignItems="flex-start">
+                      {/* <ListItemAvatar>
+                        <Avatar alt={comment.user} />
+                      </ListItemAvatar> */}
+                      <ListItemText
+                        primary={comment.user}
+                        secondary={
+                          <React.Fragment>
+                            <Typography
+                              sx={{ display: 'inline', mr: 2 }}
+                              component="span"
+                              variant="body4"
+                              color="text.secondary"
+                            >
+                              {(new Date(comment.time_stamp).toUTCString()).slice(0, 16)}
+                            </Typography>
+                            <Typography
+                              component="p"
+                              variant="body1"
+                              color="text.primary">
+                              {comment.content}
+                            </Typography>
+                          </React.Fragment>
+                        }
+                      />
+                    </ListItem>
+                    <Divider variant="inset" component="li" />
+                  </>
+                ))}
+              </List>
+            </Box>
+
+            <form onSubmit={handleSubmit}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.8 }}>
+                <TextField
+                  label="Comment"
+                  name="comment"
+                  id="comment"
+                  type="text"
+                  variant="outlined"
+                  multiline
+                  rows={6}
+                  maxRows={18}
+                  placeholder='Add a comment'
+                  value={comment}
+                  onChange={handleChange}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start' ></InputAdornment>
+                    )
+                  }}
+                />
+                <Button type="submit" variant="contained" size="large">
+                  Add Comment
+                </Button>
+              </Box>
+            </form>
+          </Box>
+        </Box>
+      )
+
+      }
+
     </div>
   )
 }
 
-export default PostDetails
+export default PostDetails;
 ```
 
-## 🚩 
+## 🚩 Create getCategory function in "BlogContext.jsx" 👇
+
+```javascript
+const [categories, setCategories] = useState([]);
+
+async function getCategory() {
+
+    try {
+      var config = {
+        method: 'get',
+        url: `${base_url}api/category/`,
+      };
+      const result = await axios(config);
+      console.log(result.data);
+      setCategories(result.data);
+    } catch (error) {
+      toastErrorNotify(error.message)
+    }
+  }
+```
+
+## 🚩 Add the states to sent values 👇
+
+```javascript
+let value = {
+    ...
+    getCategory,
+    categories,
+  }
+```
+
+## 🚩 Update "Home.jsx" (View More button added) 👇
+
+```javascript
+import React, { useContext, useEffect } from 'react'
+import { AuthContext } from '../context/AuthContext';
+import { BlogContext } from '../context/BlogContext';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import { red } from '@mui/material/colors';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { Badge, Box, Button, Grid } from '@mui/material';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import { useNavigate } from "react-router-dom";
+import { toastErrorNotify } from '../helper/ToastNotify';
+
+const Home = () => {
+  const { currentUser } = useContext(AuthContext)
+  console.log(currentUser);
+
+  const { getBlogs, blogs, getCategory, categories, page, setPage } = useContext(BlogContext)
+
+  useEffect(() => {
+    getBlogs();
+    getCategory();
+  }, [page])
+
+  console.log(categories);
+  const navigate = useNavigate()
+  const openDetails = (slug) => {
+    if (!currentUser) {
+      toastErrorNotify("Login for details of blog!");
+    } else {
+      navigate(`/details/${slug}`, { state: { slug } })
+    }
+  }
+  return (
+    <div>
+      <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
+        {blogs.map((blog) => (
+          <Grid item xs={12} md={6} lg={4} xl={3}>
+            <Card sx={{ maxWidth: 345, height: 457, position: "relative" }}>
+              <CardHeader
+                avatar={
+                  <Avatar alt="Emre Sharp" aria-label="blog" sx={{ bgcolor: red[500] }} />
+
+                }
+                title={blog.author}
+                subheader={blog.last_updated_date.slice(0, 10)}
+              />
+              <div style={{ cursor: "pointer" }} onClick={() => openDetails(blog.slug)}>
+
+                <CardMedia
+                  component="img"
+                  height="194"
+                  image={blog.image}
+                  alt={blog.title}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    {blog.title}
+                  </Typography>
+                  <Typography sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: '3',
+                    WebkitBoxOrient: 'vertical',
+                  }} variant="body2" color="text.secondary">
+                    {blog.content}
+                  </Typography>
+                </CardContent>
+
+              </div>
+              <CardActions disableSpacing sx={{ width: "90%", display: "flex", justifyContent: "space-between", position: "absolute", bottom: "5px", left: "5px" }}>
+                <div>
+                  <IconButton aria-label="add to favorites">
+                    <FavoriteIcon sx={{ color: (blog.like_post?.filter((like) => like.user_id === currentUser.id)[0]?.user_id) && "red" }} />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {blog.like_count}
+                    </Typography>
+                  </IconButton>
+                  <IconButton aria-label="comment">
+                    <ChatOutlinedIcon />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {blog.comment_count}
+                    </Typography>
+                  </IconButton>
+                  <IconButton aria-label="view">
+                    <RemoveRedEyeOutlinedIcon />
+                    <Typography sx={{ marginLeft: 1 }}>
+                      {blog.post_view_count}
+                    </Typography>
+                  </IconButton>
+                </div>
+                <div>
+                  <Badge badgeContent={blog.category} color="primary" sx={{ mx: 2 }} />
+                </div>
+              </CardActions>
+            </Card>
+          </Grid>))}
+      </Grid>
+      <Box sx={{ display: "flex", justifyContent:"center", my:3}}>
+        <Button variant="contained" size="large" onClick={()=> setPage(page + 6)} >
+          View More...
+        </Button>
+      </Box>
+    </div>
+  )
+}
+
+export default Home
+```
+
+## 🚩 Create "createPost" function in "BlogContext.jsx" 👇
+
+```javascript
+const createPost = async (data) => {
+
+    const token = window.atob(sessionStorage.getItem('token'));
+
+    var config = {
+      method: 'post',
+      url: `${base_url}api/posts/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    try {
+      console.log(data)
+      const res = await axios(config);
+      console.log(res)
+      if (res.status === 201) {
+        toastSuccessNotify("New blog created successfully.")
+      }
+    } catch (error) {
+      toastErrorNotify(error.message);
+    }
+  }
+
+  let value = {
+      ...
+      createPost,
+    }
+```

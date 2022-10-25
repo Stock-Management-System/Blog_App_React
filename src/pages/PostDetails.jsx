@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { useEffect } from 'react'
-import { Form, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { BlogContext } from '../context/BlogContext'
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -18,7 +18,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Button, Divider, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, TextField } from '@mui/material';
+import { Button, Divider, InputAdornment, List, ListItem, ListItemText, TextField } from '@mui/material';
 
 const PostDetails = () => {
 
