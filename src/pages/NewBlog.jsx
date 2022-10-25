@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -10,13 +10,10 @@ import Grid from '@mui/material/Grid';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link, useNavigate } from "react-router-dom";
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
+import { Form, Link, useNavigate } from "react-router-dom";
+import { FormControl } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
-import InputAdornment from '@mui/material/InputAdornment';
-import SettingsAccessibilityIcon from '@mui/icons-material/SettingsAccessibility';
-import { InputLabel, MenuItem, Select } from '@mui/material';
+import { InputLabel, MenuItem, Select, TextareaAutosize } from '@mui/material';
 import { BlogContext } from '../context/BlogContext';
 
 const theme = createTheme();
@@ -24,13 +21,13 @@ const theme = createTheme();
 const NewBlog = () => {
   const navigate = useNavigate()
 
-  const { getCategory, categories, } = React.useContext(BlogContext)
+  const { getCategory, categories, createPost } = React.useContext(BlogContext)
 
   const { createUser } = React.useContext(AuthContext)
 
   const [newBlog, setNewBlog] = React.useState({
     "title": "",
-    "category": 0,
+    "category_id": 0,
     "content": "",
     "image": "",
     "status": ""
@@ -41,8 +38,15 @@ const NewBlog = () => {
 
   }, [])
 
+  console.log(newBlog);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createPost(newBlog);
+    
+  }
+
   return (
-     <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ maxHeight: '91.5vh' }}>
         <CssBaseline />
 
@@ -64,147 +68,89 @@ const NewBlog = () => {
             <Typography component="h1" variant="h5" sx={{ color: "tomato" }}>
               New Blog
             </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.8, width: 350 }}>
+                  <TextField
+                    label="Title"
+                    name="title"
+                    id="title"
+                    type="text"
+                    variant="outlined"
+                    required
+                    value={newBlog.title}
+                    onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Categories</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      name='category'
+                      defaultValue=""
+                      label="Categories"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "category_id": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Categories</em>
+                      </MenuItem>
+                      {categories?.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
 
-            {/* {
-  "title": "string",
-  "author_id": 0,
-  "category": 0,
-  "content": "string",
-  "image": "string",
-  "status": "d"
-} */}
+                  <TextareaAutosize
+                    minRows={5}
+                    aria-label="Content"
+                    placeholder="Content"
+                    value={newBlog.content}
+                    defaultValue=""
+                    required
+                    onChange={(e) => setNewBlog({ ...newBlog, "content": e.target.value })}
+                  />
 
+                  <TextField
+                    label="Image URL"
+                    name="image"
+                    id="image"
+                    type="url"
+                    variant="outlined"
+                    value={newBlog.image}
+                    onChange={(e) => setNewBlog({ ...newBlog, "image": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Status</InputLabel>
+                    <Select
+                      labelId="status"
+                      id="status"
+                      name='status'
+                      defaultValue=""
+                      label="Status"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "status": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Status</em>
+                      </MenuItem>
+                      <MenuItem value="d">Draft</MenuItem>
+                      <MenuItem value="p">Published</MenuItem>
+                    </Select>
+                  </FormControl>
 
-     <Form >
-     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.8 }}>
-       <TextField
-         label="Title"
-         name="title"
-         id="title"
-         type="text"
-         variant="outlined"
-         value={newBlog.title}
-         onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
-       />
-       <InputLabel id="category">Category</InputLabel>
-       <Select
-         labelId="category"
-         id="select-category"
-         value={}
-         label="Age"
-         onChange={handleChange}
-       >
-       {categories?.map((category)=>(
-         <MenuItem value={category.name}>{category.name.toCapitalize()}</MenuItem>
-       ))}
-         <MenuItem value={20}>Twenty</MenuItem>
-         <MenuItem value={30}>Thirty</MenuItem>
-       </Select>
-       <TextField
-         label="Title"
-         name="title"
-         id="title"
-         type="text"
-         variant="outlined"
-         value={newBlog.title}
-         onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
-       />
-       <TextField
-         label="Title"
-         name="title"
-         id="title"
-         type="text"
-         variant="outlined"
-         value={newBlog.title}
-         onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
-       />
-       <TextField
-         label="Title"
-         name="title"
-         id="title"
-         type="text"
-         variant="outlined"
-         value={newBlog.title}
-         onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
-       />
-       <TextField
-         label="Title"
-         name="title"
-         id="title"
-         type="text"
-         variant="outlined"
-         value={newBlog.title}
-         onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
-       />
+                  <Button type="submit" variant="contained" size="large">
+                    Send
+                  </Button>
+                </Box>
+              </FormControl>
+            </form>
+          </Box >
 
-       <TextField
-         label="Biography"
-         name="biography"
-         id="biography"
-         type="text"
-         variant="outlined"
-         multiline
-         rows={6}
-         maxRows={18}
-         placeholder='Biography'
-         value={values.biography}
-         onChange={handleChange}
-         onBlur={handleBlur}
-         error={touched.biography && Boolean(errors.biography)}
-         helperText={touched.biography && errors.biography}
-         InputProps={{
-           startAdornment: (
-             <InputAdornment position='start' >
-               <SettingsAccessibilityIcon style={{ position: 'absolute', top: '-1px', left: '-25px' }} />
-             </InputAdornment>
-           )
-         }}
-       />
-       <TextField
-         label="password"
-         name="password"
-         id="password"
-         type="password"
-         variant="outlined"
-         value={values.password}
-         onChange={handleChange}
-         onBlur={handleBlur}
-         helperText={touched.password && errors.password}
-         error={touched.password && Boolean(errors.password)}
-       />
-       <TextField
-         label="password1"
-         name="password1"
-         id="password1"
-         type="password"
-         variant="outlined"
-         value={values.password1}
-         onChange={handleChange}
-         onBlur={handleBlur}
-         helperText={touched.password1 && errors.password1}
-         error={touched.password1 && Boolean(errors.password1)}
-       />
-       <Button type="submit" variant="contained" size="large">
-         Register
-       </Button>
-     </Box>
-             </ >
-
-
-   <Grid container sx={{ mt: 2 }}>
-
-     <Grid item>
-       <Link to="/login" variant="body2" style={{ color: "darkslategray" }}>
-         {"Do you have an account? Login"}
-       </Link>
-     </Grid>
-   </Grid>
-           </Box >
-
-         </Grid >
-       </Grid >
-     </ThemeProvider >
+        </Grid >
+      </Grid >
+    </ThemeProvider >
   )
-   }
+}
 
 export default NewBlog
