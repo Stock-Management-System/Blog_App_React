@@ -143,7 +143,7 @@ const NavBar = () => {
               About
             </Button>
           </Box>
-          
+
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title=  {currentUser ?currentUser.username :'Authorization'}>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

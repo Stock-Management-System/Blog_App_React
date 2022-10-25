@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { Badge, Grid } from '@mui/material';
+import { Badge, Box, Button, Grid } from '@mui/material';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import { useNavigate } from "react-router-dom";
@@ -21,13 +21,12 @@ const Home = () => {
   const { currentUser } = useContext(AuthContext)
   console.log(currentUser);
 
-  const { getBlogs, blogs, getCategory, categories, } = useContext(BlogContext)
+  const { getBlogs, blogs, getCategory, categories, page, setPage } = useContext(BlogContext)
 
   useEffect(() => {
     getBlogs();
     getCategory();
-
-  }, [])
+  }, [page])
 
   console.log(categories);
   const navigate = useNavigate()
@@ -102,10 +101,13 @@ const Home = () => {
                 </div>
               </CardActions>
             </Card>
-
           </Grid>))}
       </Grid>
-
+      <Box sx={{ display: "flex", justifyContent:"center", my:3}}>
+        <Button variant="contained" size="large" onClick={()=> setPage(page + 6)} >
+          View More...
+        </Button>
+      </Box>
     </div>
   )
 }
