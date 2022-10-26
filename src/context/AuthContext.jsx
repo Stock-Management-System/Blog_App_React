@@ -61,7 +61,6 @@ const AuthContextProvider = (props)=>{
       })
       console.log(res)
       if(res.data.key){
-        console.log(res)
         setMyKey(res.data.key)
         setCurrentUser(res.data.user)
         sessionStorage.setItem('currentuser',JSON.stringify(res.data.user))

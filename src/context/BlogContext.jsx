@@ -87,7 +87,7 @@ const BlogContextProvider = (props) => {
     }
   }
 
-  const createPost = async (data) => {
+  const createPost = async (data, navigate) => {
 
     const token = window.atob(sessionStorage.getItem('token'));
 
@@ -107,10 +107,63 @@ const BlogContextProvider = (props) => {
       console.log(res)
       if (res.status === 201) {
         toastSuccessNotify("New blog created successfully.")
+        navigate("/")
       }
     } catch (error) {
       toastErrorNotify(error.message);
     } 
+  }
+
+  const updatePost = async (data, navigate, slug) => {
+
+    const token = window.atob(sessionStorage.getItem('token'));
+
+    var config = {
+      method: 'put',
+      url: `${base_url}api/posts/${slug}/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    try {
+      console.log(data)
+      const res = await axios(config);
+      console.log(res)
+      if (res.status === 200) {
+        toastSuccessNotify("Post updated successfully.")
+        navigate(-1)
+      }
+    } catch (error) {
+      toastErrorNotify(error.message);
+    }
+  }
+
+  const deletePost = async (navigate, slug) => {
+
+    const token = window.atob(sessionStorage.getItem('token'));
+
+    var config = {
+      method: 'delete',
+      url: `${base_url}api/posts/${slug}/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      const res = await axios(config);
+      console.log(res)
+      if (res.status === 204) {
+        toastSuccessNotify("Post deleted successfully.")
+        navigate("/")
+      }
+    } catch (error) {
+      toastErrorNotify(error.message);
+    }
   }
 
   let value = {
@@ -126,7 +179,11 @@ const BlogContextProvider = (props) => {
     createPost,
     page,
     setPage,
+    updatePost,
+    deletePost
   }
+
+  
 
   return (
     <BlogContext.Provider value={value}>

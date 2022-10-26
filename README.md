@@ -1328,7 +1328,7 @@ export default NewBlog
 ```javascript
 import React, { useContext, useState } from 'react'
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { BlogContext } from '../context/BlogContext'
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -1352,11 +1352,13 @@ const PostDetails = () => {
 
   const [likeColor, setLikeColor] = useState(false);
   const [comment, setComment] = useState();
-  const { getOneBlog, blogDetail, detailLoading, setComments } = useContext(BlogContext)
+  const { getOneBlog, blogDetail, detailLoading, setComments, deletePost } = useContext(BlogContext)
   const { currentUser } = useContext(AuthContext)
   const { state } = useLocation()
   console.log(blogDetail)
   console.log(currentUser)
+
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -1390,7 +1392,7 @@ const PostDetails = () => {
       headers: {
         'Authorization': `Token ${token}`,
       },
-      data : data
+      data: data
     }
     try {
       const x = await axios(config)
@@ -1412,14 +1414,16 @@ const PostDetails = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Box style={{ display: "flex", alignItem: "center", justifyContent: "center", position: "relative" }} sx={{ maxWidth: { xs: "100%", sm: "80%", md: "60%" }, marginX: "auto" }}>
-          <Box sx={{}}>
+        <Box style={{ display: "flex", alignItem: "center", justifyContent: "center", position: "relative" }}>
+          <Box sx={{ maxWidth: { xs: "100%", sm: "80%", md: "70%" }, minWidth:{ xs: "100%", sm: "80%", md: "40%" }, marginX: "auto",}}>
+
             <CardMedia
+              height="500px"
               component="img"
-              height="300"
               image={blogDetail.image}
               alt={blogDetail.title}
             />
+
             <CardHeader
               avatar={
                 <Avatar sx={{ bgcolor: red[500] }} alt={blogDetail.author} aria-label="blog">
@@ -1457,14 +1461,16 @@ const PostDetails = () => {
               </IconButton>
             </CardActions>
 
+            {blogDetail.author_id === currentUser.id && <Box sx={{ my: 3, display: "flex", gap: 3 }}>
+              <Button variant="contained" size="small" color="success" onClick={()=>navigate(`/update/${state.slug}`, {state: {blogDetail}})}>Update Blog</Button>
+              <Button variant="contained" size="small" color="error" onClick={()=> deletePost(navigate, state.slug) }>Delete Blog</Button>
+            </Box>}
+
             <Box>
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                 {blogDetail.comment_post.map((comment) => (
                   <>
                     <ListItem alignItems="flex-start">
-                      {/* <ListItemAvatar>
-                        <Avatar alt={comment.user} />
-                      </ListItemAvatar> */}
                       <ListItemText
                         primary={comment.user}
                         secondary={
@@ -1605,77 +1611,80 @@ const Home = () => {
     }
   }
   return (
-    <div>
-      <Grid container spacing={2} justifyContent="center" sx={{ mt: 2 }}>
-        {blogs.map((blog) => (
-          <Grid item xs={12} md={6} lg={4} xl={3}>
-            <Card sx={{ maxWidth: 345, height: 457, position: "relative" }}>
-              <CardHeader
-                avatar={
-                  <Avatar alt="Emre Sharp" aria-label="blog" sx={{ bgcolor: red[500] }} />
+    <Box>
+      <Box style={{ margin: "2px auto" }}>
+        <Box spacing={2}>
+          <Box xs={12} md={6} lg={4} xl={3} sx={{ my:3, display:"flex", justifyContent:"center", gap:3, flexWrap:"wrap", mx: "auto" }}>
+            {blogs.map((blog) => (
+              <Card sx={{ width: 345, height: 457, position: "relative" }}>
+                <CardHeader
+                  avatar={
+                    <Avatar alt="Emre Sharp" aria-label="blog" sx={{ bgcolor: red[500] }} />
 
-                }
-                title={blog.author}
-                subheader={blog.last_updated_date.slice(0, 10)}
-              />
-              <div style={{ cursor: "pointer" }} onClick={() => openDetails(blog.slug)}>
-
-                <CardMedia
-                  component="img"
-                  height="194"
-                  image={blog.image}
-                  alt={blog.title}
+                  }
+                  title={blog.author}
+                  subheader={blog.last_updated_date.slice(0, 10)}
                 />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    {blog.title}
-                  </Typography>
-                  <Typography sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: '3',
-                    WebkitBoxOrient: 'vertical',
-                  }} variant="body2" color="text.secondary">
-                    {blog.content}
-                  </Typography>
-                </CardContent>
+                <div style={{ cursor: "pointer" }} onClick={() => openDetails(blog.slug)}>
 
-              </div>
-              <CardActions disableSpacing sx={{ width: "90%", display: "flex", justifyContent: "space-between", position: "absolute", bottom: "5px", left: "5px" }}>
-                <div>
-                  <IconButton aria-label="add to favorites">
-                    <FavoriteIcon sx={{ color: (blog.like_post?.filter((like) => like.user_id === currentUser.id)[0]?.user_id) && "red" }} />
-                    <Typography sx={{ marginLeft: 1 }}>
-                      {blog.like_count}
+                  <CardMedia
+                    component="img"
+                    height="194"
+                    image={blog.image}
+                    alt={blog.title}
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {blog.title}
                     </Typography>
-                  </IconButton>
-                  <IconButton aria-label="comment">
-                    <ChatOutlinedIcon />
-                    <Typography sx={{ marginLeft: 1 }}>
-                      {blog.comment_count}
+                    <Typography sx={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: '3',
+                      WebkitBoxOrient: 'vertical',
+                    }} variant="body2" color="text.secondary">
+                      {blog.content}
                     </Typography>
-                  </IconButton>
-                  <IconButton aria-label="view">
-                    <RemoveRedEyeOutlinedIcon />
-                    <Typography sx={{ marginLeft: 1 }}>
-                      {blog.post_view_count}
-                    </Typography>
-                  </IconButton>
+                  </CardContent>
+
                 </div>
-                <div>
-                  <Badge badgeContent={blog.category} color="primary" sx={{ mx: 2 }} />
-                </div>
-              </CardActions>
-            </Card>
-          </Grid>))}
-      </Grid>
-      <Box sx={{ display: "flex", justifyContent:"center", my:3}}>
-        <Button variant="contained" size="large" onClick={()=> setPage(page + 6)} >
-          View More...
-        </Button>
+                <CardActions disableSpacing sx={{ width: "90%", display: "flex", justifyContent: "space-between", position: "absolute", bottom: "5px", left: "5px" }}>
+                  <div>
+                    <IconButton aria-label="add to favorites">
+                      <FavoriteIcon sx={{ color: (blog.like_post?.filter((like) => like.user_id === currentUser.id)[0]?.user_id) && "red" }} />
+                      <Typography sx={{ marginLeft: 1 }}>
+                        {blog.like_count}
+                      </Typography>
+                    </IconButton>
+                    <IconButton aria-label="comment">
+                      <ChatOutlinedIcon />
+                      <Typography sx={{ marginLeft: 1 }}>
+                        {blog.comment_count}
+                      </Typography>
+                    </IconButton>
+                    <IconButton aria-label="view">
+                      <RemoveRedEyeOutlinedIcon />
+                      <Typography sx={{ marginLeft: 1 }}>
+                        {blog.post_view_count}
+                      </Typography>
+                    </IconButton>
+                  </div>
+                  <div>
+                    <Badge badgeContent={blog.category} color="primary" sx={{ mx: 2 }} />
+                  </div>
+                </CardActions>
+              </Card>
+            ))}
+          </Box>
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+          <Button variant="contained" size="large" onClick={() => setPage(page + 6)} >
+            View More...
+          </Button>
+        </Box>
       </Box>
-    </div>
+    </Box>
   )
 }
 
@@ -1685,7 +1694,7 @@ export default Home
 ## 🚩 Create "createPost" function in "BlogContext.jsx" 👇
 
 ```javascript
-const createPost = async (data) => {
+  const createPost = async (data, navigate) => {
 
     const token = window.atob(sessionStorage.getItem('token'));
 
@@ -1705,6 +1714,7 @@ const createPost = async (data) => {
       console.log(res)
       if (res.status === 201) {
         toastSuccessNotify("New blog created successfully.")
+        navigate("/")
       }
     } catch (error) {
       toastErrorNotify(error.message);
@@ -1715,4 +1725,409 @@ const createPost = async (data) => {
       ...
       createPost,
     }
+```
+
+## 🚩 Update "NewBlog.jsx" 👇
+
+```javascript
+import React, { useEffect } from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import Typography from '@mui/material/Typography';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Form, Link, useNavigate } from "react-router-dom";
+import { FormControl } from '@mui/material';
+import { AuthContext } from '../context/AuthContext';
+import { InputLabel, MenuItem, Select, TextareaAutosize } from '@mui/material';
+import { BlogContext } from '../context/BlogContext';
+
+const theme = createTheme();
+
+const NewBlog = () => {
+  const navigate = useNavigate()
+
+  const { getCategory, categories, createPost } = React.useContext(BlogContext)
+
+  const { createUser } = React.useContext(AuthContext)
+
+  const [newBlog, setNewBlog] = React.useState({
+    "title": "",
+    "category_id": 0,
+    "content": "",
+    "image": "",
+    "status": ""
+  });
+
+  useEffect(() => {
+    getCategory();
+  }, [])
+
+  console.log(newBlog);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createPost(newBlog, navigate);
+  }
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Grid container component="main" sx={{ maxHeight: '91.5vh' }}>
+        <CssBaseline />
+
+        <Grid item xs={12} component={Paper} elevation={6} square>
+
+          <Box
+            sx={{
+              my: 8,
+              mx: 4,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'darkslategray' }}>
+              <NewspaperIcon />
+            </Avatar>
+
+            <Typography component="h1" variant="h5" sx={{ color: "tomato" }}>
+              New Blog
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.8, width: 350 }}>
+                  <TextField
+                    label="Title"
+                    name="title"
+                    id="title"
+                    type="text"
+                    variant="outlined"
+                    required
+                    value={newBlog.title}
+                    onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Categories</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      name='category'
+                      defaultValue=""
+                      label="Categories"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "category_id": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Categories</em>
+                      </MenuItem>
+                      {categories?.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <TextareaAutosize
+                    minRows={5}
+                    aria-label="Content"
+                    placeholder="Content"
+                    value={newBlog.content}
+                    defaultValue=""
+                    required
+                    onChange={(e) => setNewBlog({ ...newBlog, "content": e.target.value })}
+                  />
+
+                  <TextField
+                    label="Image URL"
+                    name="image"
+                    id="image"
+                    type="url"
+                    variant="outlined"
+                    value={newBlog.image}
+                    onChange={(e) => setNewBlog({ ...newBlog, "image": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Status</InputLabel>
+                    <Select
+                      labelId="status"
+                      id="status"
+                      name='status'
+                      defaultValue=""
+                      label="Status"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "status": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Status</em>
+                      </MenuItem>
+                      <MenuItem value="d">Draft</MenuItem>
+                      <MenuItem value="p">Published</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Button type="submit" variant="contained" size="large">
+                    Send
+                  </Button>
+                </Box>
+              </FormControl>
+            </form>
+          </Box >
+
+        </Grid >
+      </Grid >
+    </ThemeProvider >
+  )
+}
+
+export default NewBlog
+```
+
+## 🚩 Create "Update" and "Delete" button in "PostDetails.jsx" before the "Comments" section 👇
+
+```javascript
+  {blogDetail.author_id === currentUser.id && <Box sx={{ my: 3, display: "flex", gap: 3 }}>
+              <Button variant="contained" size="small" color="success">Update Blog</Button>
+              <Button variant="contained" size="small" color="error">Delete Blog</Button>
+            </Box>}
+```
+
+## 🚩 Create "updatePost" function in "BlogContext.jsx" 👇
+
+```javascript
+const updatePost = async (data, navigate, slug) => {
+
+    const token = window.atob(sessionStorage.getItem('token'));
+
+    var config = {
+      method: 'put',
+      url: `${base_url}api/posts/${slug}/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    try {
+      console.log(data)
+      const res = await axios(config);
+      console.log(res)
+      if (res.status === 200) {
+        toastSuccessNotify("Post updated successfully.")
+        navigate(-1)
+      }
+    } catch (error) {
+      toastErrorNotify(error.message);
+    }
+  }
+
+  let value = {
+    ...
+    updatePost
+  }
+```
+
+## 🚩 Create "deletePost" function in "BlogContext.jsx" 👇
+
+```javascript
+const deletePost = async (navigate, slug) => {
+
+    const token = window.atob(sessionStorage.getItem('token'));
+
+    var config = {
+      method: 'delete',
+      url: `${base_url}api/posts/${slug}/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      const res = await axios(config);
+      console.log(res)
+      if (res.status === 204) {
+        toastSuccessNotify("Post deleted successfully.")
+        navigate("/")
+      }
+    } catch (error) {
+      toastErrorNotify(error.message);
+    }
+  }
+
+  let value = {
+  ...
+    deletePost
+  }
+```
+
+## 🚩 Create "UpdateBlog" page 👇
+
+```javascript
+import React, { useEffect } from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
+import Typography from '@mui/material/Typography';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Form, Link, useLocation, useNavigate } from "react-router-dom";
+import { FormControl } from '@mui/material';
+import { AuthContext } from '../context/AuthContext';
+import { InputLabel, MenuItem, Select, TextareaAutosize } from '@mui/material';
+import { BlogContext } from '../context/BlogContext';
+
+const theme = createTheme();
+
+
+const NewBlog = () => {
+  const navigate = useNavigate()
+  const {state} = useLocation()
+
+  const { getCategory, categories, createPost, updatePost } = React.useContext(BlogContext)
+
+  const { createUser } = React.useContext(AuthContext)
+
+  const [newBlog, setNewBlog] = React.useState({
+    "title": state.blogDetail.title,
+    "category_id":state.blogDetail.category_id,
+    "content": state.blogDetail.content,
+    "image": state.blogDetail.image,
+    "status": state.blogDetail.status
+  });
+
+  useEffect(() => {
+    getCategory();
+  }, [])
+
+  console.log(newBlog);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    updatePost(newBlog, navigate, state.blogDetail.slug);
+  }
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Grid container component="main" sx={{ maxHeight: '91.5vh' }}>
+        <CssBaseline />
+
+        <Grid item xs={12} component={Paper} elevation={6} square>
+
+          <Box
+            sx={{
+              my: 8,
+              mx: 4,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'darkslategray' }}>
+              <NewspaperIcon />
+            </Avatar>
+
+            <Typography component="h1" variant="h5" sx={{ color: "tomato" }}>
+              New Blog
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <FormControl>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.8, width: 350 }}>
+                  <TextField
+                    label="Title"
+                    name="title"
+                    id="title"
+                    type="text"
+                    variant="outlined"
+                    required
+                    value={newBlog.title}
+                    onChange={(e) => setNewBlog({ ...newBlog, "title": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Categories</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-helper-label"
+                      id="demo-simple-select-helper"
+                      name='category'
+                      value={newBlog.category_id}
+                      label="Categories"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "category_id": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Categories</em>
+                      </MenuItem>
+                      {categories?.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>{item.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <TextareaAutosize
+                    minRows={5}
+                    aria-label="Content"
+                    placeholder="Content"
+                    value={newBlog.content}
+                    defaultValue=""
+                    required
+                    onChange={(e) => setNewBlog({ ...newBlog, "content": e.target.value })}
+                  />
+
+                  <TextField
+                    label="Image URL"
+                    name="image"
+                    id="image"
+                    type="url"
+                    variant="outlined"
+                    value={newBlog.image}
+                    onChange={(e) => setNewBlog({ ...newBlog, "image": e.target.value })}
+                  />
+                  <FormControl>
+                    <InputLabel id="demo-simple-select-helper-label">Status</InputLabel>
+                    <Select
+                      labelId="status"
+                      id="status"
+                      name='status'
+                      value={newBlog.status}
+                      label="Status"
+                      required
+                      onChange={(e) => setNewBlog({ ...newBlog, "status": e.target.value })}
+                    >
+                      <MenuItem value="">
+                        <em>Status</em>
+                      </MenuItem>
+                      <MenuItem value="d">Draft</MenuItem>
+                      <MenuItem value="p">Published</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Button type="submit" variant="contained" size="large">
+                    Send
+                  </Button>
+                </Box>
+              </FormControl>
+            </form>
+          </Box >
+
+        </Grid >
+      </Grid >
+    </ThemeProvider >
+  )
+}
+
+export default NewBlog
+```
+
+## 🚩 Create "Profile.jsx" page 🚩
+
+```javascript
+
 ```
