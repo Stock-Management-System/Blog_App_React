@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { BlogContext } from '../context/BlogContext'
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -24,11 +24,13 @@ const PostDetails = () => {
 
   const [likeColor, setLikeColor] = useState(false);
   const [comment, setComment] = useState();
-  const { getOneBlog, blogDetail, detailLoading, setComments } = useContext(BlogContext)
+  const { getOneBlog, blogDetail, detailLoading, setComments, deletePost } = useContext(BlogContext)
   const { currentUser } = useContext(AuthContext)
   const { state } = useLocation()
   console.log(blogDetail)
   console.log(currentUser)
+
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -62,7 +64,7 @@ const PostDetails = () => {
       headers: {
         'Authorization': `Token ${token}`,
       },
-      data : data
+      data: data
     }
     try {
       const x = await axios(config)
@@ -84,15 +86,16 @@ const PostDetails = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Box style={{ display: "flex", alignItem: "center", justifyContent: "center", position: "relative" }} sx={{ maxWidth: { xs: "100%", sm: "80%", md: "60%" }, marginX: "auto" }}>
-          <Box sx={{}}>
+        <Box style={{ display: "flex", alignItem: "center", justifyContent: "center", position: "relative" }}>
+          <Box sx={{ maxWidth: { xs: "100%", sm: "80%", md: "70%" }, minWidth:{ xs: "100%", sm: "80%", md: "40%" }, marginX: "auto",}}>
 
             <CardMedia
+              height="500px"
               component="img"
-              height="300"
               image={blogDetail.image}
               alt={blogDetail.title}
             />
+
             <CardHeader
               avatar={
                 <Avatar sx={{ bgcolor: red[500] }} alt={blogDetail.author} aria-label="blog">
@@ -130,14 +133,16 @@ const PostDetails = () => {
               </IconButton>
             </CardActions>
 
+            {blogDetail.author_id === currentUser.id && <Box sx={{ my: 3, display: "flex", gap: 3 }}>
+              <Button variant="contained" size="small" color="success" onClick={()=>navigate(`/update/${state.slug}`, {state: {blogDetail}})}>Update Blog</Button>
+              <Button variant="contained" size="small" color="error" onClick={()=> deletePost(navigate, state.slug) }>Delete Blog</Button>
+            </Box>}
+
             <Box>
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                 {blogDetail.comment_post.map((comment) => (
                   <>
                     <ListItem alignItems="flex-start">
-                      {/* <ListItemAvatar>
-                        <Avatar alt={comment.user} />
-                      </ListItemAvatar> */}
                       <ListItemText
                         primary={comment.user}
                         secondary={
@@ -164,14 +169,6 @@ const PostDetails = () => {
                   </>
                 ))}
               </List>
-
-
-
-
-
-
-
-
             </Box>
 
             <form onSubmit={handleSubmit}>

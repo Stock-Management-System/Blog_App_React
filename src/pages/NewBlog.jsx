@@ -40,7 +40,7 @@ const NewBlog = () => {
   console.log(newBlog);
   const handleSubmit = (e) => {
     e.preventDefault();
-    createPost(newBlog);
+    createPost(newBlog, navigate);
   }
 
   return (
