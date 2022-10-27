@@ -15,8 +15,6 @@ import AdbIcon from '@mui/icons-material/Adb'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 
-const pages = ['Products', 'Pricing', 'Blog']
-
 const NavBar = () => {
   const navigate = useNavigate()
   const { currentUser, logOut } = useContext(AuthContext)

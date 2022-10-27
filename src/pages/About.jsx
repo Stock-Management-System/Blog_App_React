@@ -7,7 +7,7 @@ const About = () => {
 
       <Box sx={{ display: "flex", textAlign:"center", padding:{xs:"1rem", sm: "7% 7% 0 7%" , md: "10% 10% 0 10%", xl:"15% 15% 0 15%"}}}>
         <Typography variant="h5" sx={{ color: "white"}}>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Soluta nihil velit ullam repudiandae beatae nobis nisi officiis laboriosam vel. Error facilis ullamum eos.
+        On this blog page; you can create blogs in the categories of "Home, Holiday, Cars, Sports, Health, People, History, Cities, Technology" and get information from blogs created by other users. Happy blogging...
         </Typography>
       </Box>
     </Box>
