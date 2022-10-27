@@ -15,7 +15,9 @@ const BlogContextProvider = (props) => {
 
   const [page, setPage] = useState(6);
 
-  const base_url = "http://127.0.0.1:8000/"
+  const [userPosts, setUserPosts] = useState([]);
+
+  const base_url = "https://stocks.pythonanywhere.com/"
 
   const getBlogs = async () => {
 
@@ -42,7 +44,6 @@ const BlogContextProvider = (props) => {
       };
       const result = await axios(config);
       setDetailLoading(false);
-      console.log(result.data);
       setBlogDetail(result.data);
     } catch (error) {
       toastErrorNotify(error.message)
@@ -80,7 +81,6 @@ const BlogContextProvider = (props) => {
         url: `${base_url}api/category/`,
       };
       const result = await axios(config);
-      console.log(result.data);
       setCategories(result.data);
     } catch (error) {
       toastErrorNotify(error.message)
@@ -102,16 +102,14 @@ const BlogContextProvider = (props) => {
     };
 
     try {
-      console.log(data)
       const res = await axios(config);
-      console.log(res)
       if (res.status === 201) {
         toastSuccessNotify("New blog created successfully.")
         navigate("/")
       }
     } catch (error) {
       toastErrorNotify(error.message);
-    } 
+    }
   }
 
   const updatePost = async (data, navigate, slug) => {
@@ -129,9 +127,7 @@ const BlogContextProvider = (props) => {
     };
 
     try {
-      console.log(data)
       const res = await axios(config);
-      console.log(res)
       if (res.status === 200) {
         toastSuccessNotify("Post updated successfully.")
         navigate(-1)
@@ -156,13 +152,31 @@ const BlogContextProvider = (props) => {
 
     try {
       const res = await axios(config);
-      console.log(res)
+
       if (res.status === 204) {
         toastSuccessNotify("Post deleted successfully.")
         navigate("/")
       }
     } catch (error) {
       toastErrorNotify(error.message);
+    }
+  }
+
+  const usersAllPosts = async () => {
+    const token = window.atob(sessionStorage.getItem('token'));
+    const config = {
+      method: 'get',
+      url: `${base_url}api/all-posts/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+      }
+    };
+    try {
+
+      const res = await axios(config)
+      setUserPosts(res.data)
+    } catch (error) {
+      toastErrorNotify(error.message)
     }
   }
 
@@ -180,10 +194,12 @@ const BlogContextProvider = (props) => {
     page,
     setPage,
     updatePost,
-    deletePost
+    deletePost,
+    usersAllPosts,
+    userPosts
   }
 
-  
+
 
   return (
     <BlogContext.Provider value={value}>

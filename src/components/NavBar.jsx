@@ -21,7 +21,7 @@ const NavBar = () => {
   const navigate = useNavigate()
   const { currentUser, logOut } = useContext(AuthContext)
   const settings = currentUser
-    ? ['About', 'Profile', 'NewBlog', 'Logout']
+    ? ['Profile', 'MyPosts', 'NewBlog', 'Logout']
     : ['About', 'Login', 'Register']
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
@@ -40,7 +40,7 @@ const NavBar = () => {
       navigate('/newblog')
       console.log('new blog')
     } else if (e.target.innerText.toLocaleLowerCase() === 'about') {
-      navigate('/')
+      navigate('/about')
     }
   }
 

@@ -8,8 +8,10 @@ import {
 } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import { AuthContext } from '../context/AuthContext'
+import About from '../pages/About'
 import Home from '../pages/Home'
 import Login from '../pages/Login'
+import MyPosts from '../pages/MyPosts'
 import NewBlog from '../pages/NewBlog'
 import PostDetails from '../pages/PostDetails'
 import Profile from '../pages/Profile'
@@ -40,12 +42,18 @@ const AppRouter = () => {
 
         <Route path="/register" element={<Register />}></Route>
 
+        <Route path="/about" element={<About />}/>
+
         <Route path="/update/:str" element={<PrivateRouter />}>
           <Route path="" element={<UpdateBlog />} />
         </Route>
 
         <Route path="/details/:str" element={<PrivateRouter />}>
           <Route path="" element={<PostDetails />} />
+        </Route>
+
+        <Route path="/myposts" element={<PrivateRouter />}>
+          <Route path="" element={<MyPosts />} />
         </Route>
       </Routes>
     </Router>
