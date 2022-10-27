@@ -27,8 +27,6 @@ const PostDetails = () => {
   const { getOneBlog, blogDetail, detailLoading, setComments, deletePost } = useContext(BlogContext)
   const { currentUser } = useContext(AuthContext)
   const { state } = useLocation()
-  console.log(blogDetail)
-  console.log(currentUser)
 
   const navigate = useNavigate()
 
@@ -57,7 +55,6 @@ const PostDetails = () => {
       "user_id": currentUser.id,
       "post": blogDetail.id
     };
-    console.log("Like isteği yapıldı.");
     var config = {
       method: 'post',
       url: `${base_url}api/like/`,
@@ -70,7 +67,6 @@ const PostDetails = () => {
       const x = await axios(config)
       getOneBlog(state.slug);
       setLikeColor(!likeColor)
-      console.log(x)
     } catch (error) {
       console.log(error)
     }

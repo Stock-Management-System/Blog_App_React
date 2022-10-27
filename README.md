@@ -2129,5 +2129,160 @@ export default NewBlog
 ## 🚩 Create "Profile.jsx" page 🚩
 
 ```javascript
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import { CardMedia, Box, Paper, Button, Typography, IconButton, TextareaAutosize } from '@mui/material'
+import React, { useContext, useState } from 'react'
+import { AuthContext } from '../context/AuthContext'
+import { blue } from '@mui/material/colors';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+
+const Profile = () => {
+  const { currentUser, updateProfile } = useContext(AuthContext);
+
+  const [camera, setCamera] = useState(false)
+  const [profilePic, setProfilePic] = useState("");
+  const [userName, setUserName] = useState(currentUser.username);
+  const [bio, setBio] = useState(currentUser.biography);
+  const [userToggle, setUserToggle] = useState(false);
+  const [bioToggle, setBioToggle] = useState(false);
+
+  const handleUserClick = (data) => {
+    updateProfile(data)
+    setUserToggle(false);
+  }
+
+  const handleBioClick = (data) => {
+    updateProfile(data)
+    setBioToggle(false);
+  }
+
+  return (
+    <Box style={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", margin: "1rem" }}>
+      <Box>
+        <CardMedia
+          component="img"
+          image={currentUser.profile_pic}
+          alt={currentUser.username}
+          sx={{ width: 300, height: 300, overflow: "hidden" }} style={{ objectFit: "cover" }}
+        />
+      </Box>
+
+      <IconButton color="primary" aria-label="upload picture" component="label">
+        {camera &&
+          <>
+            <input value={profilePic} onChange={(e) => setProfilePic(e.target.value)} type="url" placeholder='Photo URL..' />
+            <Button onClick={() => updateProfile({ profile_pic: profilePic })}>Update</Button>
+
+          </>
+        }
+        <PhotoCamera onClick={() => setCamera(!camera)} />
+      </IconButton>
+      <Box>
+        <Box sx={{ width: "300px", marginBottom: 3 }}>
+          {userToggle ? (<Box>
+            <input value={userName} onChange={(e) => setUserName(e.target.value)} />
+            <Button onClick={() => handleUserClick({ username: userName })}>Update</Button>
+          </Box>) : (<Typography variant="h5" sx={{ my: 2 }}>
+            <AutoFixHighIcon color="primary" sx={{ cursor: "pointer", marginRight: 2 }} onClick={() => setUserToggle(true)} />
+            Username : <span style={{ color: blue[800], fontWeight: 500 }}>{currentUser.username}</span>
+          </Typography>)}
+        </Box>
+
+        <Box sx={{ width: "300px", marginBottom: 3 }}>
+          {bioToggle ? (<Box>
+            <TextareaAutosize minRows={3} maxRows={10} value={bio} onChange={(e) => setBio(e.target.value)} />
+            <Button onClick={() => handleBioClick({ biography: bio })}>Update</Button>
+          </Box>) : (<Typography variant="h5" sx={{ my: 2 }}>
+            <AutoFixHighIcon color="primary" sx={{ cursor: "pointer", marginRight: 2 }} onClick={() => setBioToggle(true)} />
+            Biography : <span style={{ color: blue[800], fontWeight: 500 }}>{currentUser.biography}</span>
+          </Typography>)}
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+export default Profile
+```
+
+## 🚩 Create "updateProfile() in "AuthContext.jsx" 👇
+
+```javascript
+ const updateProfile = async (data) => {
+    try {
+      var config = {
+        method: 'patch',
+        url: `${url}auth/update-profile/${currentUser.id}`,
+        headers: {
+          'Authorization': `Token ${myKey}`,
+        },
+        data: data
+      };
+      const res = await axios(config)
+      if (res.status === 200) {
+        setCurrentUser(res.data)
+        sessionStorage.setItem('currentuser', JSON.stringify(res.data))
+        toastSuccessNotify('User updated successfully.')
+      }
+    } catch (error) {
+      toastErrorNotify(error.message)
+    }
+  }
+
+  let value = {
+    ...
+    updateProfile
+  }
+```
+
+## 🚩 Create "userAllPosts() in "BlogContext.jsx" 👇
+
+```javascript
+  const [userPosts, setUserPosts] = useState([]);
+
+  const usersAllPosts = async () => {
+    const token = window.atob(sessionStorage.getItem('token'));
+    const config = {
+      method: 'get',
+      url: `${base_url}api/all-posts/`,
+      headers: {
+        'Authorization': `Token ${token}`,
+      }
+    };
+    try {
+
+      const res = await axios(config)
+      setUserPosts(res.data)
+    } catch (error) {
+      toastErrorNotify(error.message)
+    }
+  }
+
+  let value = {
+    ...
+    usersAllPosts,
+    userPosts
+  }
+```
+
+## 🚩 Add the "myposts" path in "AppRouter.jsx" 👇
+
+```javascript
+  <Route path="/myposts" element={<PrivateRouter />}>
+      <Route path="" element={<MyPosts />} />
+  </Route>
+```
+
+## 🚩 Customize "Navbar.jsx" for "MyPosts" page under NavBar() 👇
+
+```javascript
+const settings = currentUser
+    ? ['Profile', 'MyPosts', 'NewBlog', 'Logout']
+    : ['About', 'Login', 'Register']
+```
+
+## 🚩 Create "About.jsx" under "pages" folder 👇
+
+```javscript
 
 ```

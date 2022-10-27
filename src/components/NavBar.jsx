@@ -21,7 +21,7 @@ const NavBar = () => {
   const navigate = useNavigate()
   const { currentUser, logOut } = useContext(AuthContext)
   const settings = currentUser
-    ? ['About', 'Profile', 'NewBlog', 'Logout']
+    ? ['Profile', 'MyPosts', 'NewBlog', 'Logout']
     : ['About', 'Login', 'Register']
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
@@ -35,12 +35,10 @@ const NavBar = () => {
 
   const handleCloseNavMenu = e => {
     setAnchorElNav(null)
-    console.log(e.target.innerText)
     if (e.target.innerText.toLocaleLowerCase() === 'new blog') {
       navigate('/newblog')
-      console.log('new blog')
     } else if (e.target.innerText.toLocaleLowerCase() === 'about') {
-      navigate('/')
+      navigate('/about')
     }
   }
 
