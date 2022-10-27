@@ -35,10 +35,8 @@ const NavBar = () => {
 
   const handleCloseNavMenu = e => {
     setAnchorElNav(null)
-    console.log(e.target.innerText)
     if (e.target.innerText.toLocaleLowerCase() === 'new blog') {
       navigate('/newblog')
-      console.log('new blog')
     } else if (e.target.innerText.toLocaleLowerCase() === 'about') {
       navigate('/about')
     }

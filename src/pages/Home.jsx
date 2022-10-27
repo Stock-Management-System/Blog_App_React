@@ -19,7 +19,6 @@ import { toastErrorNotify } from '../helper/ToastNotify';
 
 const Home = () => {
   const { currentUser } = useContext(AuthContext)
-  console.log(currentUser);
 
   const { getBlogs, blogs, getCategory, categories, page, setPage } = useContext(BlogContext)
 
@@ -28,7 +27,6 @@ const Home = () => {
     getCategory();
   }, [page])
 
-  console.log(categories);
   const navigate = useNavigate()
   const openDetails = (slug) => {
     if (!currentUser) {

@@ -4,7 +4,7 @@ import { toastErrorNotify, toastSuccessNotify } from '../helper/ToastNotify';
 
 export const AuthContext = createContext();
 
-const url = "http://127.0.0.1:8000/"
+const url = "https://stocks.pythonanywhere.com/"
 
 const AuthContextProvider = (props) => {
 
@@ -37,8 +37,6 @@ const AuthContextProvider = (props) => {
         const userData = { ...res.data, token: '' }
         sessionStorage.setItem("currentuser", JSON.stringify(userData))
         const myToken = window.btoa(res.data.token)
-        console.log(res.data);
-        console.log(currentUser);
         sessionStorage.setItem('token', myToken)
         toastSuccessNotify('User registered successfully.')
         navigate("/")
@@ -84,7 +82,6 @@ const AuthContextProvider = (props) => {
         }
       };
       const res = await axios(config)
-      console.log(res)
       if (res.status === 200) {
         setCurrentUser(false)
         setMyKey(false)
@@ -108,7 +105,6 @@ const AuthContextProvider = (props) => {
         data: data
       };
       const res = await axios(config)
-      console.log(res)
       if (res.status === 200) {
         setCurrentUser(res.data)
         sessionStorage.setItem('currentuser', JSON.stringify(res.data))
@@ -127,8 +123,6 @@ const AuthContextProvider = (props) => {
     logOut,
     updateProfile
   }
-
-
 
   return (
     <AuthContext.Provider value={value}>

@@ -37,7 +37,6 @@ const NewBlog = () => {
     getCategory();
   }, [])
 
-  console.log(newBlog);
   const handleSubmit = (e) => {
     e.preventDefault();
     createPost(newBlog, navigate);

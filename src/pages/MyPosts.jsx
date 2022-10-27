@@ -20,16 +20,14 @@ import { toastErrorNotify } from '../helper/ToastNotify';
 const MyPosts = () => {
 
     const { currentUser } = useContext(AuthContext)
-    console.log(currentUser);
-  
+
     const { blogs, getCategory, categories, page, setPage, usersAllPosts, userPosts } = useContext(BlogContext)
-  
+
     useEffect(() => {
         getCategory();
         usersAllPosts();
       }, [page])
-    
-      console.log(categories);
+
       const navigate = useNavigate()
       const openDetails = (slug) => {
         if (!currentUser) {
